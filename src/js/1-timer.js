@@ -3,8 +3,12 @@ import "flatpickr/dist/flatpickr.min.css";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const timerEl = document.querySelector(".timer");
+const inputEl = document.querySelector("#datetime-picker");
 const buttonEl = document.querySelector("button[type='button']");
+const timerEl = document.querySelector(".timer");
+
+let userSelectedDate = {};
+
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -18,42 +22,69 @@ const options = {
         buttonEl.removeAttribute("disabled");
       } else {
         buttonEl.setAttribute("disabled", "true");
-        alert("Please choose a date in the future");
+        iziToast.error({
+          message: "Please choose a date in the future",
+          position: "topRight",
+          closeOnClick: true,
+        });
         this.clear();
       };
     };
   },
 };
-const calendar = flatpickr("#datetime-picker", options);
-let userSelectedDate = {};
 
-buttonEl.addEventListener("click", startCountdown);
+const calendar = flatpickr("#datetime-picker", options);
+
+buttonEl.addEventListener("click", setTimer);
+
+function setTimer() {
+  const timeMs = userSelectedDate - Date.now();
+  const time = convertMs(timeMs);
+
+  const days = timerEl.querySelector("span[data-days]");
+  const hours = timerEl.querySelector("span[data-hours]");
+  const minutes = timerEl.querySelector("span[data-minutes]");
+  const seconds = timerEl.querySelector("span[data-seconds]");
+  
+  days.textContent = String(time.days).padStart(2, "0");
+  hours.textContent = String(time.hours).padStart(2, "0");
+  minutes.textContent = String(time.minutes).padStart(2, "0");
+  seconds.textContent = String(time.seconds).padStart(2, "0");
+
+  buttonEl.setAttribute("disabled", "true");
+  inputEl.setAttribute("disabled", "true");
+
+  startCountdown(timeMs);
+}
 
 function startCountdown() {
-  const timeAmount = userSelectedDate - Date.now();
-  console.log(timeAmount);
-  
+  let intervalId = setInterval(() => {
+    const remainingTime = userSelectedDate - Date.now();
+    const time = convertMs(remainingTime);
+
+    timerEl.querySelector("span[data-days]").textContent = String(time.days).padStart(2, "0");
+    timerEl.querySelector("span[data-hours]").textContent = String(time.hours).padStart(2, "0");
+    timerEl.querySelector("span[data-minutes]").textContent = String(time.minutes).padStart(2, "0");
+    timerEl.querySelector("span[data-seconds]").textContent = String(time.seconds).padStart(2, "0");
+
+    if (remainingTime <= 1000) {
+      clearInterval(intervalId);
+      intervalId = null;
+      inputEl.removeAttribute("disabled");
+    }
+  }, 1000);
 }
 
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
 
-  // Remaining days
   const days = Math.floor(ms / day);
-  // Remaining hours
   const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
   const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
 }
-
-console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
