@@ -3,7 +3,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 const formEl = document.querySelector(".form");
 
-formEl.addEventListener("click", createNotification);
+formEl.addEventListener("submit", createNotification);
 
 function createNotification(event) {
     if (event.target.type === "submit") {
