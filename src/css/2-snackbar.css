@@ -1,0 +1,15 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 360px;
+}
+
+input[type="number"] {
+    height: 40px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+fieldset {
+    margin-bottom: 24px;
+}
