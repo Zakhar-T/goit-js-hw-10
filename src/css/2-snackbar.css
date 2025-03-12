@@ -44,6 +44,30 @@ fieldset:hover, fieldset:focus {
     border-color: #000;
 }
 
+input[type="radio"] {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+input[type="radio"]:checked {
+    appearance: none;
+}
+
+input[type="radio"]:checked::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    outline: 1px solid #4e75ff;
+    outline-offset: 3px;
+    border-radius: 50%;
+    background-color: #4e75ff;
+}
+
 button {
     display: block;
     height: 40px;
